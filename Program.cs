@@ -25,7 +25,7 @@ builder.Services.AddScoped<MessageService>();
 builder.Services.AddScoped<ItemService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<ApplicationUserService>();
-builder.Services.AddControllers();
+
 
 builder.Services.AddHttpClient();
 builder.Services.AddScoped(sp =>
@@ -49,7 +49,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.MapStaticAssets();
-app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+app.UseStatusCodePagesWithReExecute("/not-found");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -58,7 +58,13 @@ app.UseAuthorization();
 
 app.UseAntiforgery();
 
-
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider
+        .GetRequiredService<ApplicationDbContext>();
+    Directory.CreateDirectory("/app/data");
+    db.Database.Migrate();
+}
 
 using (var scope = app.Services.CreateScope())
 {
@@ -67,7 +73,7 @@ using (var scope = app.Services.CreateScope())
 
 app.MapControllers();
 
-app.MapPost("/api/auth/register",
+app.MapPost("/api/register",
 async (
     HttpContext context,
     UserManager<ApplicationUser> userManager,
@@ -139,9 +145,16 @@ app.MapPost("/api/login", async (
 });
 
 app.MapPost("/api/logout", async (
+    HttpContext httpContext,
     SignInManager<ApplicationUser> signInManager) =>
 {
     await signInManager.SignOutAsync();
+
+    httpContext.Response.Cookies.Delete(
+        IdentityConstants.ApplicationScheme);
+
+    httpContext.Response.Cookies.Delete(
+        ".AspNetCore.Identity.Application");
 
     return Results.Ok();
 });
@@ -151,8 +164,3 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.Run();
-
-
-public record LoginRequest(
-    string Email,
-    string Password);

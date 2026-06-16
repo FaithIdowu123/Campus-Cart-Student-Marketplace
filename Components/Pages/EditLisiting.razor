@@ -1,7 +1,11 @@
 @page "/listings/edit/{Id:int}"
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
 @using Campus_Cart_Student_Marketplace.Models
 @using Campus_Cart_Student_Marketplace.Services
 @inject Campus_Cart_Student_Marketplace.Services.ItemService ItemService
+@inject UserManager<ApplicationUser> UserManager
+@inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Nav
 
 <PageTitle>Edit Listing</PageTitle>
@@ -59,12 +63,28 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Item = ItemService.GetItemById(Id);
+        var authState =
+            await AuthStateProvider.GetAuthenticationStateAsync();
+
+        Console.WriteLine(
+            $"Authenticated: {authState.User.Identity?.IsAuthenticated}");
+
+        var user =
+            await UserManager.GetUserAsync(authState.User);
+
+        if (user == null)
+        {
+            Nav.NavigateTo("/login", true);
+            return;
+        }
+
+        Item = await ItemService.GetItemByIdAsync(Id);
+        
     }
 
-    private void EditListing()
+    private async Task EditListing()
     {
-        ItemService.UpdateItem(Item);
+        await ItemService.UpdateItemAsync(Item);
         Nav.NavigateTo($"/dashboard");
     }
 

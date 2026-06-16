@@ -7,7 +7,7 @@
 @inject Campus_Cart_Student_Marketplace.Services.ApplicationUserService UserService 
 @inject UserManager<ApplicationUser> UserManager
 @inject AuthenticationStateProvider AuthStateProvider
-@inject NavigationManager NavigationManager
+@inject NavigationManager Nav
 
 <div class="container my-5" style="max-width: 600px;">
     <div class="card p-4 shadow-sm border-0 rounded">
@@ -58,7 +58,13 @@
         var CurrentUser =
             await UserManager.GetUserAsync(
                 authState.User);
-        var item = ItemService.GetItemById(ItemId);
+
+        if (CurrentUser == null)
+        {
+            Nav.NavigateTo("/login", true);
+            return;
+        }
+        var item = await ItemService.GetItemByIdAsync(ItemId);
 
         if (item == null) return;
 
@@ -84,6 +90,6 @@
 
     private void GoBack()
     {
-        NavigationManager.NavigateTo($"/item/{ItemId}");
+        Nav.NavigateTo($"/item/{ItemId}");
     }
 }

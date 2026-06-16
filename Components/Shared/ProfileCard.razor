@@ -3,7 +3,7 @@
 <div class="profile-card">
 
     <div class="profile-avatar">
-        @User.FullName
+        @User.FullName[0]
     </div>
 
     <h2>@User.FullName</h2>
@@ -18,12 +18,6 @@
             <strong>Email</strong>
             <br />
             @User.Email
-        </p>
-
-        <p>
-            <strong>Phone</strong>
-            <br />
-            @User.PhoneNumber
         </p>
 
         <p>

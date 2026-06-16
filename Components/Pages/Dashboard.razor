@@ -59,6 +59,9 @@
         var user =
             await UserManager.GetUserAsync(authState.User);
 
+        CartCount = CartService.GetCartItems(user.Id).Count;
+        MessageCount = MessageService.GetUserInbox(user.Id).Count;
+
         foreach (var claim in authState.User.Claims)
         {
             Console.WriteLine($"{claim.Type} : {claim.Value}");
@@ -74,8 +77,9 @@
         }
 
         CurrentUser = user;
-    }
 
+        CartCount = CartService.GetCartItems(CurrentUser.Id).Count;
+        MessageCount = MessageService.GetUserInbox(CurrentUser.Id).Count;
 
-    
+    } 
 }

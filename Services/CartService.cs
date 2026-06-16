@@ -15,6 +15,14 @@ namespace Campus_Cart_Student_Marketplace.Services
 
         public event Action? OnCartChanged;
 
+        public async Task<List<CartItem>?> GetCartItemAsync(int Id)
+        {
+            return _context.CartItem
+                .Include(c => c.Item)
+                .Where(c => c.ItemId == Id)
+                .ToList();
+        }
+
         public List<CartItem> GetCartItems(string userId)
         {
             return _context.CartItem

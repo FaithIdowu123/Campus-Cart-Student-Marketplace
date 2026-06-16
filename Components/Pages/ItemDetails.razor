@@ -1,9 +1,15 @@
 @page "/item/{Id:int}"
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
 @using Campus_Cart_Student_Marketplace.Components.Shared
+@using Campus_Cart_Student_Marketplace.Models
 @inject Campus_Cart_Student_Marketplace.Services.ItemService ItemService
 @inject Campus_Cart_Student_Marketplace.Services.CategoryService CategoryService
 @inject Campus_Cart_Student_Marketplace.Services.CartService CartService
-@using Campus_Cart_Student_Marketplace.Models
+
+
+@inject UserManager<ApplicationUser> UserManager
+@inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Nav
 
 <PageTitle>Campus Cart - @Item.Title</PageTitle>
@@ -124,7 +130,7 @@
             }
             else
             {
-                @foreach(var I in ItemService.GetItemsByCategory(Item.CategoryId)){
+                @foreach(var I in Items){
                     <ItemComponent item=@I />    
                 }
             }
@@ -142,23 +148,39 @@
 
     private List<Item> Items = [];
     private List<Category> Categories = [];
+    private ApplicationUser CurrentUser = new();
 
     protected override async Task OnInitializedAsync()
     {
-        Item = ItemService.GetItemById(Id);
-        Items = ItemService.GetItemsByCategory(Item.CategoryId);
+        var authState =
+            await AuthStateProvider.GetAuthenticationStateAsync();
+
+        Console.WriteLine(
+            $"Authenticated: {authState.User.Identity?.IsAuthenticated}");
+
+        var user =
+            await UserManager.GetUserAsync(authState.User);
+        CurrentUser = user;
+
+        Item = await ItemService.GetItemByIdAsync(Id);
+        Items = await ItemService.GetItemsByCategoryAsync(Item.CategoryId);
         Categories = CategoryService.GetCategories();
     }
 
     public void HandleContact()
     {    
        Console.WriteLine(Item.SellerId);
-       Nav.NavigateTo($"/contact-seller/{Id}/{Item.SellerId}");
+       Nav.NavigateTo($"/contact-seller/{Id}");
     }
 
-    public void ToCart()
+    public async Task ToCart()
     {
-        CartService.AddToCart(Item, Item.SellerId);
+        if (CurrentUser == null)
+        {
+            Nav.NavigateTo("/login", true);
+            return;
+        }
+        await CartService.AddToCart(Item, CurrentUser.Id);
         Nav.NavigateTo($"/cart");
     }
     

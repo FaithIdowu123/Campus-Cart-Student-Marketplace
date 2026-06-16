@@ -70,7 +70,7 @@
 
 @code {
     private List<Campus_Cart_Student_Marketplace.Models.CartItem> cartItems = new();
-    private ApplicationUser CurrentUser = new();
+    private ApplicationUser? CurrentUser = new();
     private string currentUserId = "mock-student-123";
 
     protected override async Task OnInitializedAsync()
@@ -79,10 +79,15 @@
             await AuthStateProvider
                 .GetAuthenticationStateAsync();
 
-        var CurrentUser =
+        CurrentUser =
             await UserManager.GetUserAsync(
                 authState.User);
         // TEMP ONLY (replace with real logged-in user later)
+        if (CurrentUser == null)
+        {
+            Nav.NavigateTo("/login", true);
+            return;
+        }
         currentUserId = CurrentUser.Id;
 
         LoadCart();
