@@ -1210,14 +1210,13 @@ button:active,
 }
 
 table{
-    font-size: 10px;
     width:100%;
     border-collapse:collapse;
 }
 
 th,td{
-    padding:12px;
-    text-decoration: center;
+    padding: 10px 20px;
+    text-align: left;
     border-bottom:1px solid #eee;
 }
 
@@ -1227,22 +1226,7 @@ th,td{
         grid-template-columns:100%;
     }
 
-    table{
-        font-size: x-small;
-    }
-
-    table .primary-btn{
-        font-size: xx-small;
-        padding: 5px;
-        
-    }
-    td{
-        font-size: small;
-        padding:1px;
-        text-align:left;
-        border-bottom:1px solid #eee;
-    }
-
+    
 }
 
 .form-page,
@@ -1864,6 +1848,28 @@ th,td{
         padding: 40px;
         gap: 20px;
     }
+}
+
+@media (max-width: 900px){
+    table{
+        font-size: x-small;
+    }
+
+    table .primary-btn{
+        font-size: xx-small;
+        padding: 10px;
+        
+    }
+    th{
+        font-size: small;
+    }
+    td{
+        font-size: small;
+        padding:5px;
+        text-align:center;
+        border-bottom:1px solid #eee;
+    }
+
 }
 
 
