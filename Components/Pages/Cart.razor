@@ -3,93 +3,97 @@
 @using Campus_Cart_Student_Marketplace.Models
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Identity
+
 @inject Campus_Cart_Student_Marketplace.Services.ApplicationUserService UserService 
 @inject UserManager<ApplicationUser> UserManager
 @inject AuthenticationStateProvider AuthStateProvider
 @inject Campus_Cart_Student_Marketplace.Services.CartService CartService
 @inject NavigationManager Nav
-
-<div class="container my-5">
-    <h2 class="mb-4"><i class="bi bi-cart3"></i> Your Campus Cart</h2>
+<PageTitle>Cart</PageTitle>
+<div class="cart-container">
+    <h2 class="cart-title"><i class="bi bi-cart3"></i> Your Campus Cart</h2>
 
     @if (cartItems == null || !cartItems.Any())
     {
-        <div class="alert alert-info shadow-sm text-center py-5 rounded">
+        <div class="empty-cart">
             <h4>Your cart is empty!</h4>
-            <p class="text-muted">Find amazing student deals on textbooks, furniture, and more.</p>
-            <a href="/marketplace" class="btn btn-primary mt-2">Browse Marketplace</a>
+            <p>Find amazing student deals on textbooks, furniture, and more.</p>
+            <a href="/marketplace" class="btn-primary">Browse Marketplace</a>
         </div>
     }
     else
     {
-        <div class="row">
-            <div class="col-lg-8">
+        <div class="cart-layout">
+
+            <!-- LEFT SIDE: ITEMS -->
+            <div class="cart-items">
                 @foreach (var item in cartItems)
                 {
-                    <div class="card mb-3 shadow-sm border-0 rounded">
-                        <div class="card-body d-flex align-items-center">
-                            <img src="@(item.Item?.ImageUrl ?? "images/placeholder.png")" alt="Product Image"
-                                 class="rounded me-3" style="width: 80px; height: 80px; object-fit: cover;" />
-                            <div class="flex-grow-1">
-                                <h5 class="mb-1">@item.Item?.Title</h5>
-                                <p class="text-primary fw-bold mb-0">$@item.Item?.Price</p>
-                            </div>
-                            <div class="d-flex align-items-center me-3">
-                                <input type="number" class="form-control text-center" style="width: 70px;"
-                                       value="@item.Quantity"
-                                       @onchange="@((ChangeEventArgs e) => UpdateQty(item, int.Parse(e.Value?.ToString())))" min="1" />
-                            </div>
-                            <div>
-                                <button class="btn btn-outline-danger btn-sm" @onclick="() => RemoveItem(item.Id)">
-                                    <i class="bi bi-trash"></i> Remove
-                                </button>
-                            </div>
+                    <div class="cart-card">
+                        <img src="@(item.Item?.ImageUrl ?? "images/placeholder.png")" />
+
+                        <div class="cart-info">
+                            <h5>@item.Item?.Title</h5>
+                            <p class="price">$@item.Item?.Price</p>
                         </div>
+
+                        <input type="number"
+                               value="@item.Quantity"
+                               min="1"
+                               class="qty-input"
+                               @onchange="@(e => UpdateQty(item, int.Parse(e.Value?.ToString())))" />
+
+                        <button class="remove-btn" @onclick="() => RemoveItem(item.Id)">
+                            Remove
+                        </button>
                     </div>
                 }
             </div>
 
-            <div class="col-lg-4">
-                <div class="card p-4 shadow-sm border-0 rounded bg-light">
-                    <h4>Order Summary</h4>
-                    <hr />
-                    <div class="d-flex justify-content-between mb-3 fs-5">
-                        <span>Total:</span>
-                        <span class="fw-bold text-success">$@CartService.GetTotal(currentUserId)</span>
-                    </div>
-                    <div class="alert alert-warning py-2 small">
-                        ⚠️ <strong>Reminder:</strong> Campus Cart does not process payments online. Arrange a secure
-                        exchange on campus.
-                    </div>
-                    <button class="btn btn-primary w-100 py-2 fw-bold" disabled>Proceed to Secure Checkout</button>
+            <!-- RIGHT SIDE: SUMMARY -->
+            <div class="cart-summary">
+                <h4>Order Summary</h4>
+                <hr />
+
+                <div class="total">
+                    <span>Total:</span>
+                    <span class="total-price">
+                        $@CartService.GetTotal(currentUserId)
+                    </span>
                 </div>
+
+                <div class="warning">
+                    ⚠️ Campus Cart does not process payments online.
+                    Arrange secure exchange on campus.
+                </div>
+
+                <button class="checkout-btn" disabled>
+                    Proceed to Secure Checkout
+                </button>
             </div>
+
         </div>
     }
 </div>
 
 @code {
-    private List<Campus_Cart_Student_Marketplace.Models.CartItem> cartItems = new();
-    private ApplicationUser? CurrentUser = new();
-    private string currentUserId = "mock-student-123";
+    private List<CartItem> cartItems = new();
+    private ApplicationUser? CurrentUser;
+    private string currentUserId = "";
 
     protected override async Task OnInitializedAsync()
     {
-        var authState =
-            await AuthStateProvider
-                .GetAuthenticationStateAsync();
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
 
-        CurrentUser =
-            await UserManager.GetUserAsync(
-                authState.User);
-        // TEMP ONLY (replace with real logged-in user later)
+        CurrentUser = await UserManager.GetUserAsync(authState.User);
+
         if (CurrentUser == null)
         {
             Nav.NavigateTo("/login", true);
             return;
         }
-        currentUserId = CurrentUser.Id;
 
+        currentUserId = CurrentUser.Id;
         LoadCart();
     }
 
@@ -97,9 +101,9 @@
     {
         cartItem.Quantity = qty;
 
-        var sent = await CartService.UpdateQuantity(cartItem);
+        var success = await CartService.UpdateQuantity(cartItem);
 
-        if (sent)
+        if (success)
         {
             Nav.NavigateTo(Nav.Uri, forceLoad: true);
         }
@@ -109,8 +113,6 @@
     {
         cartItems = CartService.GetCartItems(currentUserId);
     }
-
-
 
     private void RemoveItem(int cartItemId)
     {

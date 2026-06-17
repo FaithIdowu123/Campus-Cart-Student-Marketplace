@@ -3,6 +3,7 @@
 @inject HttpClient Http
 @inject NavigationManager Nav
 @using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
 @inject AuthenticationStateProvider AuthStateProvider
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
@@ -29,7 +30,7 @@
     <!-- RIGHT: AUTH + CART -->
     <div class="desktop-actions">
 
-        @if (IsLoggedIn)
+        @if (User.Identity?.IsAuthenticated == true)
         {
             <!-- USER MENU -->
             <div class="user-menu">
@@ -98,7 +99,7 @@
 
             <NavLink href="/">Home</NavLink>
 
-            @if (IsLoggedIn)
+            @if (User.Identity?.IsAuthenticated == true)
             {
                 <NavLink href="/dashboard">Profile</NavLink>
                 <NavLink href="/cart">Cart</NavLink>
@@ -122,23 +123,14 @@
 @code {
 
     private bool ShowMobileMenu;
-    private bool ShowUserMenu = true;
+    private bool ShowUserMenu = false;
 
-    private bool IsLoggedIn;
+    private ClaimsPrincipal? User;
     private string UserName = "User";
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        IsLoggedIn = user.Identity?.IsAuthenticated ?? false;
-
-        if (IsLoggedIn)
-        {
-            var appUser = await UserManager.GetUserAsync(user);
-            UserName = appUser?.UserName ?? "User";
-        }
+        await RefreshAuthState();
     }
 
     private void ToggleMenu()
@@ -172,10 +164,20 @@
         Nav.NavigateTo("/register");
     }
 
-    private async Task Logout()
+    private void Logout()
     {
-        await Http.PostAsync("api/logout", null);
+        Nav.NavigateTo("/logout", forceLoad: true);
+    }
 
-        Nav.NavigateTo("/", forceLoad: true);
+    private async Task RefreshAuthState()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        User = authState.User;
+
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            var appUser = await UserManager.GetUserAsync(User);
+            UserName = appUser?.UserName ?? "User";
+        }
     }
 }

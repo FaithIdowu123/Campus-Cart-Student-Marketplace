@@ -774,7 +774,7 @@ button:active,
 }
 
 .shop-now p {
-    color: rgba(255,255,255,.9);
+    color: rgba(255, 255, 255, 1);
 
     margin-bottom: 2rem;
 }
@@ -862,19 +862,19 @@ button:active,
     z-index: 2;
 
     padding: 18px;
-    color: white;
+    color: rgb(0, 0, 0);
 
     text-align: left;
 }
 
 .banner__content h2,
 .banner__content h3 {
-    color: white;
+    color: rgb(0, 0, 0);
     margin-bottom: 6px;
 }
 
 .banner__content p {
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(0, 0, 0, 0.85);
     font-size: 0.95rem;
 }
 
@@ -996,7 +996,7 @@ button:active,
 .item-category {
     display: inline-block;
 
-    background: rgba(0,180,216,.15);
+    background: rgba(213, 248, 255, 0.15);
 
     color: var(--primary);
 
@@ -1108,7 +1108,7 @@ button:active,
 }
 
 .footer a {
-    color: #cbd5e1;
+    color: #ffffff;
     text-decoration: none;
     display: block;
     margin-top: 8px;
@@ -1210,20 +1210,37 @@ button:active,
 }
 
 table{
+    font-size: 10px;
     width:100%;
     border-collapse:collapse;
 }
 
 th,td{
     padding:12px;
-    text-align:left;
+    text-decoration: center;
     border-bottom:1px solid #eee;
 }
 
 @media(max-width:900px){
 
     .dashboard-container{
-        grid-template-columns:1fr;
+        grid-template-columns:100%;
+    }
+
+    table{
+        font-size: x-small;
+    }
+
+    table .primary-btn{
+        font-size: xx-small;
+        padding: 5px;
+        
+    }
+    td{
+        font-size: small;
+        padding:1px;
+        text-align:left;
+        border-bottom:1px solid #eee;
     }
 
 }
@@ -1629,6 +1646,155 @@ th,td{
 
 .auth-divider::after {
     margin-left: 1rem;
+}
+
+/* CART PAGE CONTAINER */
+.cart-container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 30px 15px;
+}
+
+/* TITLE */
+.cart-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+
+/* EMPTY CART */
+.empty-cart {
+    text-align: center;
+    padding: 60px 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.empty-cart h4 {
+    margin-bottom: 10px;
+}
+
+.btn-primary {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 18px;
+    background: #0d6efd;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+/* MAIN LAYOUT */
+.cart-layout {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* LEFT SIDE */
+.cart-items {
+    flex: 2;
+}
+
+/* CART CARD */
+.cart-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.cart-card img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* ITEM INFO */
+.cart-info {
+    flex: 1;
+    margin-left: 15px;
+}
+
+.price {
+    color: #0d6efd;
+    font-weight: bold;
+}
+
+/* QUANTITY INPUT */
+.qty-input {
+    width: 60px;
+    text-align: center;
+    padding: 5px;
+}
+
+/* REMOVE BUTTON */
+.remove-btn {
+    background: transparent;
+    border: 1px solid #dc3545;
+    color: #dc3545;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.remove-btn:hover {
+    background: #dc3545;
+    color: white;
+}
+
+/* SUMMARY */
+.cart-summary {
+    flex: 1;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 12px;
+    height: fit-content;
+}
+
+.total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.total-price {
+    font-weight: bold;
+    color: green;
+}
+
+.warning {
+    font-size: 13px;
+    background: #fff3cd;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+/* CHECKOUT BUTTON */
+.checkout-btn {
+    width: 100%;
+    padding: 12px;
+    background: #0066ff;
+    border: none;
+    color: rgb(255, 255, 255);
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: not-allowed;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .cart-layout {
+        flex-direction: column;
+    }
 }
 
 /* ==========================================

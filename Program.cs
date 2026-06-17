@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 // 1. ADD THIS LINE AT THE TOP TO BRIDGE THE NAMESPACE:
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Antiforgery;
 using Campus_Cart_Student_Marketplace.Services;
 using Campus_Cart_Student_Marketplace.Components;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("ApplicationDbContext") ?? throw new InvalidOperationException("Connection string 'ApplicationDbContext' not found.")));
 
-builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();;
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
 // Add services to the container.
@@ -25,7 +27,6 @@ builder.Services.AddScoped<MessageService>();
 builder.Services.AddScoped<ItemService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<ApplicationUserService>();
-
 
 builder.Services.AddHttpClient();
 builder.Services.AddScoped(sp =>
@@ -144,19 +145,12 @@ app.MapPost("/api/login", async (
     return Results.Redirect("/dashboard");
 });
 
-app.MapPost("/api/logout", async (
-    HttpContext httpContext,
+app.MapGet("/logout", async (
+    HttpContext context,
     SignInManager<ApplicationUser> signInManager) =>
 {
     await signInManager.SignOutAsync();
-
-    httpContext.Response.Cookies.Delete(
-        IdentityConstants.ApplicationScheme);
-
-    httpContext.Response.Cookies.Delete(
-        ".AspNetCore.Identity.Application");
-
-    return Results.Ok();
+    return Results.Redirect("/");
 });
 
 
