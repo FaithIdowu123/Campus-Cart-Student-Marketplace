@@ -121,18 +121,12 @@
 
         var user =
             await UserManager.GetUserAsync(authState.User);
-        if (user == null)
+            
+        if (user == null || !user.Seller)
         {
             Nav.NavigateTo("/login", true);
             return;
         }
-
-        if (user == null)
-        {
-            Nav.NavigateTo("/login", true);
-            return;
-        }
-
         User = user;
     }
 

@@ -58,7 +58,7 @@
             await UserManager.GetUserAsync(authState.User);
 
 
-        if (user == null)
+        if (user == null || !user.Seller)
         {
             Nav.NavigateTo("/login", true);
             return;
